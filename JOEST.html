@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>JOE STUDIO | Ultimate Creator Hub</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#090909">
+<link rel="apple-touch-icon" href="icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+/* 🌍 MULTIVERSE THEMES VARIABLES */
+:root {
+  --bg:        #090909;
+  --panel:     #111111;
+  --card:      #181818;
+  --border:    rgba(255,255,255,0.07);
+  --pink:      #FF2E93;
+  --cyan:      #00E5FF;
+  --purple:    #8A2BE2;
+  --amber:     #FFB800;
+  --lime:      #39FF14;
+  --red:       #FF3B30;
+  --text:      #FFFFFF;
+  --muted:     #71717A;
+  --r:         16px;
+  --font-h:    'Bebas Neue', sans-serif;
+}
+
+body.theme-roman {
+  --bg: #F4ECE6; --panel: #E8DCC4; --card: #FFFFFF;
+  --border: #B69A52; --pink: #8B0000; --cyan: #B69A52; --purple: #5C4B3A; 
+  --amber: #D35400; --lime: #556B2F; --red: #C00000;
+  --text: #2C1E16; --muted: #8C7B6A; --r: 4px;
+}
+body.theme-stone {
+  --bg: #2d241d; --panel: #3e332a; --card: #4e4035;
+  --border: #795c34; --pink: #c0392b; --cyan: #d35400; --purple: #8d6e63; 
+  --amber: #e67e22; --lime: #f39c12; --red: #c0392b;
+  --text: #e0d5c1; --muted: #b0a088; --r: 8px;
+}
+body.theme-qin {
+  --bg: #1c0909; --panel: #2b0d0d; --card: #3a1111;
+  --border: #d4af37; --pink: #ff3333; --cyan: #d4af37; --purple: #8b6b4a; 
+  --amber: #e67e22; --lime: #00a86b; --red: #ff0000;
+  --text: #fff3e0; --muted: #b8997a; --r: 0px;
+}
+body.theme-retro80 {
+  --bg: #0f0217; --panel: #1c0533; --card: #2e0854;
+  --border: #ff00cc; --pink: #ff00cc; --cyan: #00ffff; --purple: #a366ff; 
+  --amber: #ffb800; --lime: #39ff14; --red: #ff0055;
+  --text: #ffffff; --muted: #a366ff; --r: 4px;
+}
+body.theme-alien {
+  --bg: #030805; --panel: #07170e; --card: #0b2516;
+  --border: #00ff88; --pink: #ff3366; --cyan: #00ff88; --purple: #4d9973; 
+  --amber: #00ffff; --lime: #ccffe6; --red: #ff0000;
+  --text: #ccffe6; --muted: #4d9973; --r: 24px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Prompt',sans-serif;min-height:100vh;overflow-x:hidden; transition: background 0.3s, color 0.3s;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 10% 10%,rgba(255,46,147,0.06),transparent),radial-gradient(ellipse 60% 50% at 90% 90%,rgba(0,229,255,0.06),transparent);pointer-events:none;z-index:0;}
+
+/* 🎬 ANIMATIONS */
+@keyframes fadeInVault { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes warpSpeed { 0% { transform: scale(1); filter: blur(0px); opacity: 1; } 30% { filter: blur(2px); opacity: 1; } 100% { transform: scale(4); filter: blur(20px); opacity: 0; pointer-events: none; } }
+@keyframes systemBoot { 0% { opacity: 0; transform: scale(0.95); filter: brightness(0.5); } 100% { opacity: 1; transform: scale(1); filter: brightness(1); } }
+
+.warp-active { animation: warpSpeed 0.8s cubic-bezier(0.5, 0, 0.1, 1) forwards !important; pointer-events: none; }
+.boot-active { animation: systemBoot 1s cubic-bezier(0.1, 0.8, 0.2, 1) forwards; }
+
+/* 🔒 LOGIN SCREEN */
+#login-screen { position: fixed; inset: 0; background: var(--card); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); animation: fadeInVault 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+.login-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 40px; width: 100%; max-width: 480px; box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); text-align: center; }
+.cyber-lock { display: flex; justify-content: center; gap: 8px; margin: 30px 0; }
+.digit-col { display: flex; flex-direction: column; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 8px; padding: 4px; transition: all 0.2s; }
+.digit-col.active-col { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+.arrow-btn { background: transparent; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 8px 12px; transition: all 0.2s; user-select: none; }
+.arrow-btn:hover { color: var(--cyan); transform: scale(1.2); }
+.arrow-btn:active { color: var(--pink); transform: scale(0.9); }
+.digit-display { font-family: 'Space Mono', monospace; font-size: 36px; font-weight: 700; color: var(--text); text-shadow: 0 0 10px var(--cyan); margin: 6px 0; width: 36px; text-align: center; user-select: none; }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+.error-shake { animation: shake 0.4s ease-in-out; }
+.error-shake .digit-col { border-color: var(--red); background: rgba(255, 59, 48, 0.1); }
+.error-shake .digit-display { text-shadow: 0 0 10px var(--red); color: var(--red); }
+
+/* UI COMPONENTS */
+.topbar{position:sticky;top:0;z-index:100;height:68px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px; transition: background 0.3s;}
+.brand{font-family:var(--font-h);font-size:26px;letter-spacing:3px;background:linear-gradient(90deg,var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent; font-weight:bold;}
+.badge{font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2px;background:rgba(255,255,255,0.05);border:1px solid var(--border);padding:4px 10px;border-radius:4px;color:var(--text);margin-left:10px;vertical-align:middle;}
+.shell{display:flex;min-height:calc(100vh - 68px);position:relative;z-index:1;}
+.sidebar{width:256px;background:var(--panel);border-right:1px solid var(--border);padding:20px 12px;display:flex;flex-direction:column;gap:4px;flex-shrink:0; transition: background 0.3s;}
+.nav-section{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);padding:8px 12px 4px;margin-top:8px;}
+.nav{padding:12px 14px;border-radius:8px;color:var(--muted);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .2s;}
+.nav:hover{background:rgba(255,255,255,0.05);color:var(--text);}
+.nav.active{background:var(--cyan);color:#000;}
+.nav .dot{width:8px;height:8px;border-radius:50%;}
+.main{flex:1;padding:36px 40px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+.view{display:none;} .view.active{display:block;}
+
+/* THUMBNAIL LAYERS & CANVAS */
+.canvas-area{background:var(--panel);border-radius:12px;padding:10px;border:1px solid var(--border);text-align:center;}
+#thumb-canvas{display:block;max-width:100%;max-height:60vh;margin:0 auto;cursor:grab;touch-action:none;box-shadow:0 10px 30px rgba(0,0,0,0.3); border-radius: 8px;}
+#thumb-canvas:active{cursor:grabbing;}
+.tool-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:14px; transition: background 0.3s;}
+.layer-box{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;}
+.layer-box:focus-within{border-color:var(--cyan);}
+.layer-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Prompt';font-size:13px;padding:8px;margin-bottom:8px;outline:none;}
+.layer-input:focus{border-color:var(--cyan);}
+.layer-grid{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;}
+.color-swatch{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);padding:2px;background:none;cursor:pointer;}
+.btn{display:inline-flex;align-items:center;justify-content:center;background:var(--cyan);color:#000;border:none;border-radius:8px;padding:10px 18px;font-family:'Prompt';font-size:13px;font-weight:600;cursor:pointer;gap:8px;transition:all 0.2s;}
+.btn:hover{filter:brightness(1.1);}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text);}
+.btn-outline:hover{background:var(--panel); border-color:var(--cyan); color:var(--cyan);}
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:24px;text-align:center;cursor:pointer;color:var(--muted);font-size:13px;transition:all .2s;}
+.upload-zone:hover{border-color:var(--cyan);color:var(--text);}
+.bg-nav-btn{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;}
+
+/* TOOL CARDS */
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:28px;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
+.tool-card:hover{transform:translateY(-4px);border-color:var(--cyan);box-shadow:0 16px 40px rgba(0,0,0,.3);}
+.card-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:20px;border:1px solid var(--border); background:var(--panel);}
+.card-title{font-size:17px;font-weight:600;margin-bottom:8px; color:var(--cyan);}
+.card-desc{font-size:13px;color:var(--muted);line-height:1.7;}
+.back-btn{display:inline-flex;align-items:center;gap:8px;background:none;border:none;color:var(--muted);font-family:'Prompt',sans-serif;font-size:14px;cursor:pointer;margin-bottom:24px;padding:8px 0;transition:color .2s; font-weight:bold;}
+.back-btn:hover{color:var(--cyan);}
+
+/* FORMS & COMPONENTS */
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-family:'Space Mono',monospace;letter-spacing:.5px;}
+.form-group input[type=text],.form-group select, .form-group textarea{width:100%;background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Prompt',sans-serif;font-size:13px;padding:8px 12px;outline:none;}
+.form-group input:focus,.form-group select:focus, .form-group textarea:focus{border-color:var(--cyan);}
+
+/* KANBAN BOARD */
+.kanban-board { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; min-height: 500px; align-items: flex-start;}
+.kanban-col { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); width: 280px; flex-shrink: 0; display: flex; flex-direction: column; max-height: 100%; }
+.kanban-col-header { padding: 16px; font-weight: 700; border-bottom: 1px solid var(--border); font-size: 14px; letter-spacing: 0.5px;}
+.kanban-items { padding: 12px; flex: 1; overflow-y: auto; min-height: 150px; display:flex; flex-direction:column; gap:8px;}
+.k-item { background: var(--panel); border: 1px solid var(--border); padding: 14px; border-radius: 8px; cursor: grab; font-size: 13px; display: flex; justify-content: space-between; align-items: flex-start; transition: border-color 0.2s;}
+.k-item:active { cursor: grabbing; border-color: var(--cyan); }
+.k-item-del { color: var(--red); font-size: 14px; cursor: pointer; padding: 0 4px; background: rgba(255,59,48,0.1); border-radius: 4px;}
+
+/* SOUNDBOARD */
+.sound-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; text-align: center; }
+.sound-icon { font-size: 40px; margin-bottom: 16px; }
+.sound-ctrl { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
+input[type=range] { width: 100%; accent-color: var(--cyan); background: var(--panel); border-radius: 8px; outline: none; }
+
+/* INVOICE MAKER */
+.invoice-preview { background: #ffffff; color: #000000; padding: 40px; border-radius: 8px; font-family: 'Prompt', sans-serif; min-height: 500px; box-shadow: 0 0 20px rgba(0,0,0,0.1);}
+.inv-header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 20px; }
+.inv-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+.inv-table th, .inv-table td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; font-size: 14px;}
+.inv-total { text-align: right; font-size: 20px; font-weight: 700; color: #FF2E93; }
+
+/* AI B-ROLL / OUTPUTS */
+.ai-output-box { background: var(--panel); padding: 20px; border-radius: 8px; border: 1px solid var(--border); white-space: pre-wrap; line-height: 1.8; font-size: 14px; color: var(--text);}
+.ai-output-box strong { color: var(--cyan); }
+
+/* GUIDE */
+.guide-block { background: var(--panel); border-left: 4px solid var(--pink); padding: 20px; margin-bottom: 20px; border-radius: 0 8px 8px 0; border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);}
+.guide-block h3 { color: var(--cyan); margin-bottom: 10px; font-size: 16px; }
+.guide-block p { font-size: 14px; margin-bottom: 8px; color: var(--text); }
+
+/* MODAL & TOAST */
+.modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); display:none; justify-content:center; align-items:center; z-index:999; }
+.modal-overlay.active { display:flex; }
+.modal-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 30px; width: 450px; max-width: 90%; }
+.toast{position:fixed;bottom:28px;right:28px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s; pointer-events:none; font-weight:600;}
+.toast.show{opacity:1;transform:translateY(0);}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
+
+/* 📱 MOBILE RESPONSIVE */
+@media(max-width: 768px) {
+  .shell { flex-direction: column; }
+  .topbar { height: 60px; padding: 0 16px; }
+  .brand { font-size: 22px; }
+  .badge, .avatar-wrap span { display: none; }
+  .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px 16px; border-right: none; border-bottom: 1px solid var(--border); position: sticky; top: 60px; z-index: 90; background: var(--card); backdrop-filter: blur(10px); }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .nav-section, .sidebar-footer { display: none; }
+  .nav { padding: 8px 16px; font-size: 13px; white-space: nowrap; }
+  .main { padding: 20px 16px; }
+  .grid, .kanban-board { grid-template-columns: 1fr; }
+  .invoice-preview { padding: 20px; }
+}
+.layer-action-btn { background:rgba(255,255,255,0.1); border:none; color:var(--text); padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer; }
+.layer-action-btn:hover { background:var(--panel); border-color:var(--cyan); color:var(--cyan); }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box" id="login-box-container">
+    <div class="brand" style="justify-content: center; margin-bottom: 5px;">⚡ JOE STUDIO</div>
+    <p style="color: var(--cyan); margin-bottom: 24px; font-size: 12px; font-family: 'Space Mono', monospace; letter-spacing:1px;" data-i18n="login_sub">ULTIMATE SUITE. ENTER PASSCODE.</p>
+    <div class="cyber-lock" id="cyber-lock-grid"></div>
+    <p style="font-size: 11px; color: var(--muted); margin-bottom: 20px;">* ปลดล็อกโดยกดคีย์บอร์ด (0-9) หรือคลิกลูกศร</p>
+    <button class="btn" style="width: 100%; justify-content: center; font-family: 'Space Mono', monospace; letter-spacing: 2px; font-size: 14px;" onclick="checkCyberLogin()">[ DECRYPT & LOGIN ]</button>
+  </div>
+</div>
+
+<div id="app-content" style="display: none;">
+  <div class="topbar">
+    <div class="brand">⚡ JOE STUDIO <span class="badge">ULTIMATE HUB</span></div>
+    <div class="avatar-wrap" style="display:flex; align-items:center; gap:12px;">
+      <button class="btn btn-outline" style="padding:4px 8px; font-size:11px; margin:0;" onclick="cycleTheme()" id="theme-btn-main">THEME: CYBER</button>
+      <button class="btn btn-outline" style="padding:4px 8px; font-size:11px; margin:0;" onclick="toggleLang()" id="lang-btn-main">TH / EN</button>
+      <div style="width:32px; height:32px; background:var(--cyan); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:12px;">JO</div>
+    </div>
+  </div>
+
+  <div class="shell">
+    <div class="sidebar">
+      <div class="nav-section" data-i18n="nav_sec_main">MAIN</div>
+      <div class="nav active" id="nav-dash" onclick="showView('dashboard', this)"><div class="dot" style="background:var(--cyan)"></div> <span data-i18n="nav_dash">Dashboard</span></div>
+      
+      <div class="nav-section" data-i18n="nav_sec_tools">CREATION TOOLS</div>
+      <div class="nav" id="nav-ai" onclick="showView('ai-tools', this)"><div class="dot" style="background:var(--pink)"></div> <span data-i18n="nav_ai">AI Creator Studio</span></div>
+      <div class="nav" id="nav-thumb" onclick="showView('thumbnail', this)"><div class="dot" style="background:var(--purple)"></div> <span data-i18n="nav_thumb">Thumbnails V2</span></div>
+      <div class="nav" id="nav-tc" onclick="showView('timecode', this)"><div class="dot" style="background:var(--amber)"></div> <span data-i18n="nav_time">Timecode Logger</span></div>
+      <div class="nav" id="nav-prompt" onclick="showView('prompter', this)"><div class="dot" style="background:var(--lime)"></div> <span data-i18n="nav_prompt">Teleprompter</span></div>
+      
+      <div class="nav-section" data-i18n="nav_sec_manage">MANAGEMENT & FOCUS</div>
+      <div class="nav" id="nav-kanban" onclick="showView('kanban', this)"><div class="dot" style="background:var(--cyan)"></div> <span data-i18n="nav_kanban">Kanban Board</span></div>
+      <div class="nav" id="nav-sound" onclick="showView('soundboard', this)"><div class="dot" style="background:var(--pink)"></div> <span data-i18n="nav_sound">Focus Soundboard</span></div>
+      <div class="nav" id="nav-invoice" onclick="showView('invoice', this)"><div class="dot" style="background:var(--purple)"></div> <span data-i18n="nav_invoice">Quick Invoice</span></div>
+      <div class="nav" id="nav-color" onclick="showView('moodboard', this)"><div class="dot" style="background:var(--amber)"></div> <span data-i18n="nav_color">Color Moodboard</span></div>
+      
+      <div class="nav-section" data-i18n="nav_sec_help">HELP</div>
+      <div class="nav" id="nav-guide" onclick="showView('guide', this)"><div class="dot" style="background:var(--muted)"></div> 📖 <span data-i18n="nav_guide">คู่มือการใช้งาน</span></div>
+
+      <div style="flex:1;"></div>
+      <div class="sidebar-footer">
+        <div class="nav" onclick="logout()" style="color:var(--red);"><div class="dot" style="background:var(--red);"></div> <span data-i18n="nav_logout">ออกจากระบบ</span></div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div id="view-dashboard" class="view active">
+        <div style="margin-bottom:30px;">
+          <h1 style="font-size:28px;margin-bottom:8px;" data-i18n="dash_title">Welcome Back!</h1>
+          <p style="color:var(--cyan);font-size:14px; font-family:'Space Mono'; letter-spacing:1px;" data-i18n="dash_sub">ULTIMATE CREATOR SUITE IS ONLINE.</p>
+        </div>
+        <div class="grid">
+          <div class="tool-card" onclick="showView('ai-tools', document.getElementById('nav-ai'))">
+            <div class="card-icon" style="color:var(--pink);">✨</div>
+            <div class="card-title">AI Creator Studio</div>
+            <div class="card-desc" data-i18n="card_ai_desc">ปั่นชื่อคลิป, เขียนสคริปต์เต็ม และหาไอเดียภาพ B-Roll จบในที่เดียว</div>
+          </div>
+          <div class="tool-card" onclick="showView('kanban', document.getElementById('nav-kanban'))">
+            <div class="card-icon" style="color:var(--cyan);">📋</div>
+            <div class="card-title">Project Kanban Board</div>
+            <div class="card-desc" data-i18n="card_kanban_desc">ลาก-วาง จัดการสถานะวิดีโอตั้งแต่ไอเดียจนถึงอัปโหลด</div>
+          </div>
+          <div class="tool-card" onclick="showView('soundboard', document.getElementById('nav-sound'))">
+            <div class="card-icon" style="color:var(--purple);">🎧</div>
+            <div class="card-title">Focus Soundboard</div>
+            <div class="card-desc" data-i18n="card_sound_desc">เสียงสร้างบรรยากาศ (ฝน, ทะเล, อวกาศ) ช่วยเพิ่มสมาธิตอนตัดต่อ</div>
+          </div>
+          <div class="tool-card" onclick="showView('invoice', document.getElementById('nav-invoice'))">
+            <div class="card-icon" style="color:var(--amber);">🧾</div>
+            <div class="card-title">Quick Invoice</div>
+            <div class="card-desc" data-i18n="card_inv_desc">ออกใบเสนอราคา / ใบแจ้งหนี้ด่วน กดปุ่มเดียวเป็น PDF</div>
+          </div>
+          <div class="tool-card" onclick="showView('thumbnail', document.getElementById('nav-thumb'))">
+            <div class="card-icon" style="color:var(--lime);">🖼️</div>
+            <div class="card-title">Thumbnail Gen V2</div>
+            <div class="card-desc" data-i18n="card_thumb_desc">สร้างปกคลิปแบบมีเลเยอร์ ลากย่อขยายอิสระ มี Safe Zone</div>
+          </div>
+          <div class="tool-card" onclick="showView('timecode', document.getElementById('nav-tc'))">
+            <div class="card-icon" style="color:var(--red);">⏱️</div>
+            <div class="card-title">Timecode Logger</div>
+            <div class="card-desc" data-i18n="card_tc_desc">จดเวลา มาร์คจุดตัดต่อ โหลดไฟล์ CSV นำเข้าโปรแกรมตัดต่อ</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-ai-tools" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+            <div>
+                <h1 style="font-size:28px;font-weight:700;">✨ AI Creator Studio</h1>
+                <p style="color:var(--muted);" data-i18n="ai_desc">ผู้ช่วยอัจฉริยะ ปั่นคอนเทนต์ตั้งแต่คิดชื่อยันหาภาพประกอบ</p>
+            </div>
+            <button class="btn btn-outline" onclick="openApiModal()" style="border-color:var(--cyan); color:var(--cyan);">⚙️ API Key</button>
+        </div>
+        
+        <div class="tool-panel">
+          <div class="form-group">
+            <label style="color:var(--cyan);" data-i18n="ai_label_topic">1. กำหนดหัวข้อ / คีย์เวิร์ด (Topic)</label>
+            <input type="text" id="ai-topic" placeholder="พิมพ์หัวข้อวิดีโอที่ต้องการ..." data-i18n-placeholder="ai_ph_topic">
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
+            <button class="btn" style="background:var(--pink);" onclick="generateAITitle()" data-i18n="ai_btn_title">🎣 1. ปั่นชื่อคลิป & ฮุคหยุดนิ้ว</button>
+            <button class="btn" style="background:var(--cyan); color:#000;" onclick="generateAIScript()" data-i18n="ai_btn_script">📝 2. เขียนสคริปต์เต็ม</button>
+            <button class="btn" style="background:var(--amber); color:#000;" onclick="generateAIBroll()" data-i18n="ai_btn_broll">🎞️ 3. หาไอเดียภาพ (B-Roll)</button>
+          </div>
+        </div>
+
+        <div id="ai-output-container" style="display:none;" class="tool-panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+                <h3 style="color:var(--cyan); font-size:16px;" id="ai-output-title">Output</h3>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:11px;" onclick="copyAIOutput()">📋 Copy</button>
+            </div>
+            <div id="ai-output-box" class="ai-output-box"></div>
+        </div>
+      </div>
+
+      <div id="view-kanban" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="margin-bottom:20px;">
+          <h1 style="font-size:28px;font-weight:700;">📋 Project Kanban Board</h1>
+          <p style="color:var(--muted);" data-i18n="kb_desc">ลาก-วาง เพื่ออัปเดตสถานะงาน (ข้อมูลบันทึกอัตโนมัติ)</p>
+        </div>
+        
+        <div style="margin-bottom:20px; display:flex; gap:10px;">
+            <input type="text" id="new-task-input" style="background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:10px 15px; color:var(--text); font-family:'Prompt'; width:300px; outline:none;" placeholder="ชื่อโปรเจกต์ใหม่..." data-i18n-placeholder="kb_ph_task" onkeydown="if(event.key==='Enter') addKanbanTask()">
+            <button class="btn" style="background:var(--cyan); color:#000;" onclick="addKanbanTask()" data-i18n="kb_btn_add">+ เพิ่มโปรเจกต์</button>
+        </div>
+
+        <div class="kanban-board">
+            <div class="kanban-col" id="col-idea" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="kanban-col-header" style="color:var(--text);" data-i18n="kb_col1">💡 ไอเดีย (Ideas)</div>
+                <div class="kanban-items" id="items-idea"></div>
+            </div>
+            <div class="kanban-col" id="col-script" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="kanban-col-header" style="color:var(--cyan);" data-i18n="kb_col2">📝 เขียนสคริปต์</div>
+                <div class="kanban-items" id="items-script"></div>
+            </div>
+            <div class="kanban-col" id="col-shoot" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="kanban-col-header" style="color:var(--pink);" data-i18n="kb_col3">🎥 กำลังถ่ายทำ</div>
+                <div class="kanban-items" id="items-shoot"></div>
+            </div>
+            <div class="kanban-col" id="col-edit" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="kanban-col-header" style="color:var(--purple);" data-i18n="kb_col4">✂️ กำลังตัดต่อ</div>
+                <div class="kanban-items" id="items-edit"></div>
+            </div>
+            <div class="kanban-col" id="col-done" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="kanban-col-header" style="color:var(--lime);" data-i18n="kb_col5">✅ พร้อมอัปโหลด</div>
+                <div class="kanban-items" id="items-done"></div>
+            </div>
+        </div>
+      </div>
+
+      <div id="view-soundboard" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h1 style="font-size:28px;font-weight:700;">🎧 Ambient & Focus Soundboard</h1>
+              <p style="color:var(--muted);" data-i18n="snd_desc">เปิดเสียงสร้างบรรยากาศ สังเคราะห์ผ่าน Web Audio API สดๆ ไม่พึ่งเน็ต</p>
+            </div>
+            <button class="btn" style="background:var(--red); color:#fff;" onclick="stopAllSounds()" data-i18n="snd_btn_stop">🛑 ปิดเสียงทั้งหมด</button>
+        </div>
+        
+        <div class="grid">
+            <div class="sound-card">
+                <div class="sound-icon">🌧️</div>
+                <h3 style="margin-bottom:5px;">Heavy Rain</h3>
+                <p style="font-size:12px; color:var(--muted);" data-i18n="snd_rain">เสียงฝนตก (Brown Noise)</p>
+                <div class="sound-ctrl">
+                    <button class="btn" style="background:var(--cyan); color:#000; padding:6px 12px;" id="btn-snd-rain" onclick="toggleSound('rain')">Play</button>
+                    <input type="range" id="vol-rain" min="0" max="1" step="0.05" value="0.5" oninput="updateVol('rain', this.value)">
+                </div>
+            </div>
+            <div class="sound-card">
+                <div class="sound-icon">🌌</div>
+                <h3 style="margin-bottom:5px;">Space Drone</h3>
+                <p style="font-size:12px; color:var(--muted);" data-i18n="snd_space">ความถี่อวกาศลอยคอ</p>
+                <div class="sound-ctrl">
+                    <button class="btn" style="background:var(--cyan); color:#000; padding:6px 12px;" id="btn-snd-space" onclick="toggleSound('space')">Play</button>
+                    <input type="range" id="vol-space" min="0" max="1" step="0.05" value="0.5" oninput="updateVol('space', this.value)">
+                </div>
+            </div>
+            <div class="sound-card">
+                <div class="sound-icon">🌊</div>
+                <h3 style="margin-bottom:5px;">Ocean Waves</h3>
+                <p style="font-size:12px; color:var(--muted);" data-i18n="snd_wave">เสียงคลื่นทะเลเข้าฝั่ง</p>
+                <div class="sound-ctrl">
+                    <button class="btn" style="background:var(--cyan); color:#000; padding:6px 12px;" id="btn-snd-wave" onclick="toggleSound('wave')">Play</button>
+                    <input type="range" id="vol-wave" min="0" max="1" step="0.05" value="0.5" oninput="updateVol('wave', this.value)">
+                </div>
+            </div>
+            <div class="sound-card">
+                <div class="sound-icon">🧘</div>
+                <h3 style="margin-bottom:5px;">Binaural Focus</h3>
+                <p style="font-size:12px; color:var(--muted);" data-i18n="snd_focus">คลื่นสมองเพิ่มสมาธิ (40Hz)</p>
+                <div class="sound-ctrl">
+                    <button class="btn" style="background:var(--cyan); color:#000; padding:6px 12px;" id="btn-snd-focus" onclick="toggleSound('focus')">Play</button>
+                    <input type="range" id="vol-focus" min="0" max="1" step="0.05" value="0.5" oninput="updateVol('focus', this.value)">
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <div id="view-invoice" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="margin-bottom:20px;">
+          <h1 style="font-size:28px;font-weight:700;">🧾 Quick Invoice Maker</h1>
+          <p style="color:var(--muted);" data-i18n="inv_desc">ออกใบเสนอราคา / ใบแจ้งหนี้ ฉบับย่อ</p>
+        </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; align-items:start;">
+            <div class="tool-panel">
+                <h3 style="margin-bottom:15px; color:var(--cyan);" data-i18n="inv_h1">📝 ข้อมูลลูกค้าและงาน</h3>
+                <div class="form-group"><label data-i18n="inv_lbl_client">ชื่อลูกค้า / บริษัท</label><input type="text" id="inv-client" placeholder="Client Name" oninput="updateInvoice()"></div>
+                <div class="form-group"><label data-i18n="inv_lbl_date">วันที่ออกบิล</label><input type="date" id="inv-date" onchange="updateInvoice()"></div>
+                <div class="form-group"><label data-i18n="inv_lbl_job">ชื่องาน / โปรเจกต์</label><input type="text" id="inv-job" placeholder="Project Description" oninput="updateInvoice()"></div>
+                <div class="form-group"><label data-i18n="inv_lbl_price">ราคา (หน่วย)</label><input type="number" id="inv-price" placeholder="5000" oninput="updateInvoice()"></div>
+                <div class="form-group"><label data-i18n="inv_lbl_note">หมายเหตุ</label><input type="text" id="inv-note" placeholder="Note" oninput="updateInvoice()"></div>
+                <button class="btn" style="width:100%; margin-top:10px;" onclick="downloadInvoicePDF()" data-i18n="inv_btn_pdf">⬇️ บันทึกเป็นไฟล์ PDF</button>
+            </div>
+            <div>
+                <h3 style="margin-bottom:15px; color:var(--muted); font-size:14px; font-family:'Space Mono';">LIVE PREVIEW</h3>
+                <div class="invoice-preview" id="invoice-doc">
+                    <div class="inv-header">
+                        <div>
+                            <h2 style="margin:0; font-size:24px; font-weight:700;">JOE STUDIO</h2>
+                            <p style="color:#666; font-size:12px; margin-top:5px;">Professional Creator Service</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <h1 style="margin:0; color:#333; font-weight:700;">INVOICE</h1>
+                            <p style="font-size:12px; margin-top:5px; color:#666;">Date: <span id="preview-date" style="color:#000;">YYYY-MM-DD</span></p>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:30px;">
+                        <p style="font-weight:600; font-size:14px; color:#666;">Bill To:</p>
+                        <p id="preview-client" style="font-size:18px; font-weight:600; margin-top:4px;">Client Name</p>
+                    </div>
+                    <table class="inv-table">
+                        <thead><tr><th style="border-bottom:2px solid #000;">Description</th><th style="text-align:right; border-bottom:2px solid #000;">Amount</th></tr></thead>
+                        <tbody><tr><td id="preview-job" style="padding-top:15px;">Project Description</td><td style="text-align:right; padding-top:15px;"><span id="preview-price">0</span> THB</td></tr></tbody>
+                    </table>
+                    <div class="inv-total">Total Due: <span id="preview-total">0</span> THB</div>
+                    <div style="margin-top:50px; font-size:12px; color:#666; border-top:1px solid #ddd; padding-top:15px;">
+                        <p>Note: <span id="preview-note" style="color:#000;">-</span></p>
+                        <p style="margin-top:30px; text-align:center; font-style:italic;">Thank you for your business!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      
+      <div id="view-thumbnail" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; align-items:start;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span style="font-size:14px; font-weight:600;">⚡ Live Preview</span>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button class="bg-nav-btn" onclick="prevBg()">◀</button>
+                <span id="bg-counter" style="font-family:'Space Mono'; font-size:12px; color:var(--cyan);">0 / 0</span>
+                <button class="bg-nav-btn" onclick="nextBg()">▶</button>
+              </div>
+            </div>
+            <div class="canvas-area"><canvas id="thumb-canvas"></canvas></div>
+            <div style="display:flex; gap:10px; margin-top:16px;">
+              <button class="btn" style="flex:1;" onclick="downloadThumb()" data-i18n="tb_btn_dl">⬇ โหลดรูป / ZIP</button>
+              <button class="btn btn-outline" style="flex:1;" onclick="clearCanvas()" data-i18n="tb_btn_clear">✕ ล้างพื้นหลัง</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="tool-panel">
+              <h3 data-i18n="tb_h1">🖼 1. พื้นหลัง & เช็คระยะ</h3>
+              <div class="upload-zone" onclick="document.getElementById('bg-upload').click()">
+                <input type="file" id="bg-upload" accept="image/*" multiple onchange="loadBg(event)" style="display:none;">
+                <div style="font-size:32px;margin-bottom:10px;">📁</div>
+                <div style="font-weight:600;" data-i18n="tb_upload">คลิกเพื่ออัปโหลดพื้นหลัง</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-top:16px;">
+                <label style="font-size:12px;color:var(--muted);flex:1;" data-i18n="tb_color">สีพื้นหลัง</label>
+                <input type="color" id="bg-color" class="color-swatch" value="#0A0A0A" oninput="drawThumb(); saveThumbSettings();">
+              </div>
+              <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+                <label style="font-size:12px;color:var(--cyan);display:block;margin-bottom:6px;" data-i18n="tb_safe">📱 เปิดดูเส้น Safe Zone</label>
+                <select class="layer-input" id="safe-zone" onchange="drawThumb()">
+                  <option value="none">ปิด (ซ่อนเส้น)</option>
+                  <option value="tiktok">แนวตั้ง (TikTok / Shorts)</option>
+                  <option value="youtube">แนวนอน (YouTube)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="tool-panel">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px;">
+                <h3 data-i18n="tb_h2">✍️ 2. เลเยอร์ (Layers)</h3>
+                <div style="display:flex; gap:6px;">
+                   <button class="btn btn-outline" style="padding:6px 12px; font-size:11px; color:var(--cyan);" onclick="addTextLayer()" data-i18n="tb_add_txt">+ ข้อความ</button>
+                   <button class="btn btn-outline" style="padding:6px 12px; font-size:11px; color:var(--pink);" onclick="document.getElementById('img-layer-upload').click()" data-i18n="tb_add_img">+ รูปภาพ</button>
+                   <input type="file" id="img-layer-upload" accept="image/png, image/jpeg, image/webp" style="display:none;" onchange="addImageLayer(event)">
+                </div>
+              </div>
+              <div id="layers-container"></div>
+            </div>
+
+            <div class="tool-panel">
+              <h3 data-i18n="tb_h3">🎨 3. Gradient Overlay</h3>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div>
+                  <label style="font-size:11px;color:var(--muted);margin-bottom:4px;display:block;" data-i18n="tb_grad_dir">ทิศทาง</label>
+                  <select id="overlay-dir" class="layer-input" onchange="drawThumb(); saveThumbSettings();">
+                    <option value="bottom">ล่างขึ้นบน</option>
+                    <option value="top">บนลงล่าง</option>
+                    <option value="none" selected>ไม่ใช้</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:11px;color:var(--muted);margin-bottom:4px;display:block;" data-i18n="tb_grad_op">ความเข้มดำ</label>
+                  <input type="range" id="overlay-opacity" min="0" max="100" value="50" oninput="drawThumb(); saveThumbSettings();" style="width:100%; accent-color:var(--cyan);">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-timecode" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="margin-bottom:20px;">
+          <h1 style="font-size:28px;font-weight:700;">Video Timecode Logger</h1>
+          <p style="color:var(--muted);" data-i18n="tc_desc">💡 ในช่องโน้ต กด <kbd>Enter</kbd> เพื่อ Stamp เวลา ข้อมูลจดออโต้</p>
+        </div>
+
+        <div class="video-wrap">
+          <div id="video-drop" class="video-placeholder" onclick="document.getElementById('vid-upload').click()">
+            <input type="file" id="vid-upload" accept="video/*" onchange="loadVideo(event)">
+            <div style="font-size:40px;">🎬</div>
+            <div style="font-size:14px;font-weight:600;" data-i18n="tc_upload">คลิกเพื่อเลือกไฟล์วิดีโอจากเครื่อง</div>
+          </div>
+          <video id="main-video" style="display:none;" controls></video>
+        </div>
+
+        <div class="tc-controls">
+          <div class="tc-display" id="tc-display">00:00:00.000</div>
+          <input type="text" class="note-input" id="tc-note" placeholder="พิมพ์โน้ตตรงนี้... แล้วกด Enter" data-i18n-placeholder="tc_ph_note" onkeydown="if(event.key==='Enter')stampTime()">
+          <select id="tc-type" style="background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Prompt',sans-serif;font-size:13px;padding:10px 12px;outline:none;">
+            <option value="cut">✂️ คัททิ้ง</option>
+            <option value="fx">✨ ใส่เอฟเฟกต์/ซับ</option>
+            <option value="note">📝 โน้ตเตือนความจำ</option>
+          </select>
+          <button class="btn" onclick="stampTime()" style="background:var(--cyan);color:#000;" data-i18n="tc_btn_stamp">⏺ สแตมป์</button>
+          <button class="btn btn-outline" onclick="exportTimecodeCSV()" style="color:var(--cyan); border-color:rgba(0,229,255,0.3);" data-i18n="tc_btn_csv">⬇ โหลด .CSV</button>
+          <button class="btn btn-outline" onclick="copyAllLog()">📋 Copy</button>
+        </div>
+
+        <div class="tool-panel" style="padding:0; overflow:hidden;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--panel);border-bottom:1px solid var(--border);">
+            <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);"><span data-i18n="tc_log">TIMECODE LOG — </span> <span id="log-count">0</span></span>
+            <button class="btn btn-outline" style="font-size:12px;padding:4px 10px; color:var(--red);" onclick="clearLog()" data-i18n="tc_btn_clear">🗑 ล้างข้อมูล</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="log-table">
+              <thead><tr><th>#</th><th>TIMECODE</th><th>TYPE</th><th>NOTE</th><th>ACT</th></tr></thead>
+              <tbody id="log-body"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px;font-size:13px;">No data</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-prompter" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="margin-bottom:20px;">
+          <h1 style="font-size:28px;font-weight:700;">Teleprompter</h1>
+          <p style="color:var(--muted);" data-i18n="pm_desc">อ่านสคริปต์ลื่นไหล พร้อมระบบคำนวณเวลาและสะท้อนกระจก</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; align-items:start;">
+          <div class="tool-panel">
+            <h3 style="color:var(--cyan);font-size:14px;margin-bottom:12px;" data-i18n="pm_h1">⚙️ ตั้งค่าสคริปต์</h3>
+            <textarea id="prompter-input" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Prompt';font-size:14px;padding:15px;outline:none;" rows="10" oninput="updatePrompterText()" placeholder="วางสคริปต์ของคุณที่นี่..."></textarea>
+            <div id="read-time-est" style="font-size:12px; color:var(--cyan); margin-top:8px; font-weight:600;">เวลาอ่านประมาณ: 0 นาที 0 วินาที</div>
+            
+            <div style="margin-top:20px;">
+              <label style="font-size:12px; color:var(--muted);"><span data-i18n="pm_speed">ความเร็ว:</span> <span id="p-speed-val" style="color:var(--cyan);">2</span></label>
+              <input type="range" id="prompter-speed" min="1" max="10" value="2" step="0.5" oninput="document.getElementById('p-speed-val').textContent=this.value" style="accent-color:var(--cyan);">
+            </div>
+            <div style="margin-top:16px;">
+              <label style="font-size:12px; color:var(--muted);"><span data-i18n="pm_size">ขนาด:</span> <span id="p-size-val">60</span>px</label>
+              <input type="range" id="prompter-size" min="30" max="150" value="60" oninput="updatePrompterStyle()" style="accent-color:var(--cyan);">
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:20px; background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--border);">
+              <input type="checkbox" id="prompter-mirror" onchange="updatePrompterStyle()" style="width:20px; height:20px; accent-color:var(--cyan);">
+              <label style="font-size:13px; color:var(--text); cursor:pointer;" for="prompter-mirror" data-i18n="pm_mirror">พลิกข้อความ (Mirror Mode)</label>
+            </div>
+          </div>
+
+          <div style="background:#000; border:2px solid var(--border); border-radius:16px; height:600px; position:relative; overflow:hidden; display:flex; flex-direction:column;">
+            <div style="position:absolute; top:35%; left:0; width:100%; height:2px; background:rgba(0,229,255,0.5); z-index:5; pointer-events:none; box-shadow:0 0 10px var(--cyan);"></div>
+            <div style="position:absolute; top:35%; left:10px; color:var(--cyan); font-size:10px; transform:translateY(-15px);">◀ EYE LEVEL</div>
+            <div style="flex:1; position:relative;">
+                <div id="prompter-content" style="position:absolute; top:40%; left:20px; right:20px; text-align:center; font-size:60px; font-weight:600; line-height:1.6; color:#fff; transition: transform 0.1s linear;"></div>
+            </div>
+            <div style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:10; display:flex; gap:10px; background:rgba(0,0,0,0.7); padding:10px 16px; border-radius:30px; backdrop-filter:blur(5px); border:1px solid var(--border);">
+              <button class="btn" style="background:var(--cyan); color:#000;" id="btn-prompter-play" onclick="togglePrompter()">▶ Play</button>
+              <button class="btn btn-outline" onclick="resetPrompter()">🔄 Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-moodboard" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="margin-bottom:20px;">
+          <h1 style="font-size:28px;font-weight:700;">Color Moodboard</h1>
+          <p style="color:var(--muted);" data-i18n="mb_desc">เก็บโค้ดสีประจำโปรเจกต์ รีเฟรชหน้าเว็บก็ไม่หาย</p>
+        </div>
+
+        <div class="tool-panel">
+          <h3 style="font-size:14px;font-weight:600;margin-bottom:12px;" data-i18n="mb_h1">🎨 เพิ่มสีลงใน Palette</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
+            <div class="form-group" style="margin-bottom:0;flex:1;min-width:200px;">
+              <label data-i18n="mb_sel">เลือกกลุ่ม (Palette)</label>
+              <select id="target-palette" class="layer-input" style="margin:0;">
+                <option value="0">Project 1</option>
+                <option value="1">Project 2</option>
+                <option value="2">Project 3</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label data-i18n="mb_pick">จิ้มสี</label>
+              <input type="color" id="new-color-picker" value="#00E5FF" style="width:48px;height:36px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;padding:2px;">
+            </div>
+            <div class="form-group" style="margin-bottom:0;flex:1;min-width:120px;">
+              <label>HEX Code</label>
+              <input type="text" id="new-color-hex" value="#00E5FF" maxlength="7" style="background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Space Mono',monospace;font-size:13px;padding:8px 12px;outline:none;width:100%">
+            </div>
+            <button class="btn" onclick="addColorToBoard()" style="background:var(--cyan); color:#000;" data-i18n="mb_btn_add">+ เพิ่มสี</button>
+          </div>
+        </div>
+        <div class="color-mb-grid" id="palette-grid"></div>
+      </div>
+
+      <div id="view-guide" class="view">
+        <button class="back-btn" onclick="showView('dashboard', document.getElementById('nav-dash'))" data-i18n="btn_back">← กลับหน้าหลัก</button>
+        <div style="margin-bottom:20px;">
+          <h1 style="font-size:28px;font-weight:700;">📖 คู่มือการใช้งาน</h1>
+          <p style="color:var(--muted);">วิธีใช้งาน Ultimate Creator Suite</p>
+        </div>
+
+        <div class="guide-block" style="border-color:var(--pink); background:rgba(255,46,147,0.05);">
+            <h3 style="color:var(--pink);">✨ AI Creator Studio</h3>
+            <p><strong>ปั่นชื่อคลิป:</strong> พิมพ์คีย์เวิร์ด แล้วกดปุ่ม ระบบจะส่งชื่อ 5 แบบที่เน้นความน่าสงสัยมาให้</p>
+            <p><strong>เขียนสคริปต์:</strong> AI จะแบ่งท่อน HOOK, BODY, CTA ให้พร้อมนำไปอ่าน</p>
+            <p><strong>หาไอเดียภาพ:</strong> AI จะบอกว่าช่วงไหนควรใช้ B-Roll หรือภาพแบบไหนประกอบคลิป</p>
+            <p style="font-size:12px; color:var(--muted); margin-top:5px;">*ต้องใส่ API Key ของ Gemini ก่อน (รับฟรีที่ Google AI Studio)</p>
+        </div>
+
+        <div class="guide-block" style="border-color:var(--cyan); background:rgba(0,229,255,0.05);">
+            <h3 style="color:var(--cyan);">📋 Kanban Board</h3>
+            <p>พิมพ์ชื่อโปรเจกต์ในช่อง Input แล้วกด <strong>เพิ่มโปรเจกต์</strong></p>
+            <p>เมื่อทำงานถึงขั้นตอนไหน ให้ <strong>"คลิกค้างแล้วลาก" (Drag & Drop)</strong> ไปวางในคอลัมน์นั้นๆ ข้อมูลเซฟออโต้</p>
+        </div>
+
+        <div class="guide-block" style="border-color:var(--purple); background:rgba(138,43,226,0.05);">
+            <h3 style="color:var(--purple);">🎧 Focus Soundboard</h3>
+            <p>ระบบสร้างเสียงสดๆ ผ่าน <strong>Web Audio API</strong> ไม่กินแบนด์วิดท์เน็ต</p>
+            <p>เมื่อต้องการหยุด สามารถกดปุ่ม <span style="color:var(--red);">🛑 ปิดเสียงทั้งหมด</span> ได้ทันที</p>
+        </div>
+
+        <div class="guide-block" style="border-color:var(--amber); background:rgba(255,184,0,0.05);">
+            <h3 style="color:var(--amber);">🧾 Quick Invoice</h3>
+            <p>กรอกข้อมูลฝั่งซ้าย ระบบจะอัปเดตหน้าตาบิลฝั่งขวาแบบเรียลไทม์ กดปุ่มเดียวเซฟเป็น PDF</p>
+        </div>
+
+        <div class="guide-block" style="border-color:var(--lime); background:rgba(57,255,20,0.05);">
+            <h3 style="color:var(--lime);">🖼️ Thumbnail, ⏱️ Timecode & 📜 Prompter</h3>
+            <p><strong>Thumbnail:</strong> อัปโหลดรูป ลากวางเลเยอร์ เพิ่มข้อความ <strong>(กด Enter เพื่อขึ้นบรรทัดใหม่ได้)</strong></p>
+            <p><strong>Timecode:</strong> เล่นวิดีโอ กด Enter ตอนพิมพ์โน้ตเพื่อประทับเวลา โหลดเป็น CSV</p>
+            <p><strong>Prompter:</strong> วางสคริปต์ ปรับความเร็ว สามารถกด "พลิกข้อความ" หากอ่านผ่านกระจกท้อนแสงหน้ากล้อง</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="apiModal">
+    <div class="modal-box">
+        <div style="font-size: 16px; font-weight: 700; margin-bottom: 12px; color:var(--cyan);">🤖 ตั้งค่า Google Gemini API</div>
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5;">
+            ระบบต้องการ <b>API Key</b> เพื่อใช้งาน AI ประมวลผล<br><br>
+            👉 <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--cyan);">กดรับกุญแจฟรีจาก Google ที่นี่</a><br>
+            <span style="font-size:11px;">(กุญแจถูกบันทึกไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น ปลอดภัย 100%)</span>
+        </div>
+        <input type="password" id="apiKeyInput" placeholder="วางกุญแจ AIzaSy... ตรงนี้" class="layer-input" style="font-family: monospace;">
+        <div style="display:flex; gap:10px;">
+            <button class="btn" style="background:var(--cyan);color:#000;flex:1;" onclick="saveApiKey()">💾 บันทึก</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="closeApiModal()">ยกเลิก</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('✅ Service Worker: ทำงานเรียบร้อย'))
+        .catch(err => console.log('❌ Service Worker: ผิดพลาด', err));
+    });
+  }
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   THEMES & i18n
+   ═══════════════════════════════════════════════════════════ */
+const themes = ['cyber', 'roman', 'stone', 'qin', 'retro80', 'alien'];
+let currentThemeIdx = 0;
+let currentLang = localStorage.getItem('joeStudioLang') || 'th';
+
+const i18n = {
+  en: {
+    login_sub: "ULTIMATE SUITE. ENTER PASSCODE.",
+    app_title: "JOE STUDIO", badge_restricted: "ULTIMATE HUB",
+    nav_sec_main: "MAIN", nav_dash: "Dashboard",
+    nav_sec_tools: "CREATION TOOLS", nav_ai: "AI Creator Studio", nav_thumb: "Thumbnails V2", nav_time: "Timecode Logger", nav_prompt: "Teleprompter",
+    nav_sec_manage: "MANAGEMENT & FOCUS", nav_kanban: "Kanban Board", nav_sound: "Focus Soundboard", nav_invoice: "Quick Invoice", nav_color: "Color Moodboard",
+    nav_sec_help: "HELP", nav_guide: "User Guide", nav_logout: "Logout",
+    dash_title: "Welcome Back!", dash_sub: "ULTIMATE CREATOR SUITE IS ONLINE.",
+    card_ai_desc: "Generate titles, scripts, and B-Roll ideas with AI.", card_kanban_desc: "Drag & drop to manage video statuses.", card_sound_desc: "Ambient sounds for deep focus.", card_inv_desc: "Create and export invoices to PDF.", card_thumb_desc: "Design thumbnails with layers and safe zones.", card_tc_desc: "Log timestamps and export as CSV.",
+    btn_back: "← Back to Dashboard",
+    ai_desc: "Smart assistant for content creation.", ai_label_topic: "1. Video Topic / Keyword", ai_ph_topic: "Enter your topic here...", ai_btn_title: "🎣 1. Generate Hooks", ai_btn_script: "📝 2. Write Script", ai_btn_broll: "🎞️ 3. Suggest B-Rolls",
+    kb_desc: "Drag and Drop to update project status.", kb_ph_task: "New project name...", kb_btn_add: "+ Add Project", kb_col1: "💡 Ideas", kb_col2: "📝 Scripting", kb_col3: "🎥 Shooting", kb_col4: "✂️ Editing", kb_col5: "✅ Ready",
+    snd_desc: "Ambient sounds generated via Web Audio API.", snd_btn_stop: "🛑 Stop All", snd_rain: "Brown Noise", snd_space: "Space Frequency", snd_wave: "Ocean Shore", snd_focus: "40Hz Binaural",
+    inv_desc: "Create quick invoices.", inv_h1: "📝 Client & Job Info", inv_lbl_client: "Client Name", inv_lbl_date: "Date", inv_lbl_job: "Job Description", inv_lbl_price: "Amount", inv_lbl_note: "Note", inv_btn_pdf: "⬇️ Save as PDF",
+    tb_btn_dl: "⬇ Download", tb_btn_clear: "✕ Clear BG", tb_h1: "🖼 1. Background", tb_upload: "Click to upload BG", tb_color: "BG Color", tb_safe: "📱 Safe Zone", tb_h2: "✍️ 2. Layers", tb_add_txt: "+ Text", tb_add_img: "+ Image", tb_h3: "🎨 3. Gradient", tb_grad_dir: "Direction", tb_grad_op: "Opacity",
+    tc_desc: "💡 Press <kbd>Enter</kbd> in note field to stamp time.", tc_upload: "Click to select video", tc_ph_note: "Type note and press Enter", tc_btn_stamp: "⏺ Stamp", tc_btn_csv: "⬇ Export CSV", tc_log: "TIMECODE LOG — ", tc_btn_clear: "🗑 Clear",
+    mb_desc: "Store project HEX codes.", mb_h1: "🎨 Add Color", mb_sel: "Target Bank", mb_pick: "Pick", mb_btn_add: "+ Add Color",
+    pm_desc: "Smooth reading with mirror reflection mode.", pm_h1: "⚙️ Settings", pm_speed: "Speed:", pm_size: "Size:", pm_mirror: "Mirror Mode"
+  },
+  th: {
+    login_sub: "ULTIMATE SUITE. ENTER PASSCODE.",
+    app_title: "JOE STUDIO", badge_restricted: "ULTIMATE HUB",
+    nav_sec_main: "MAIN", nav_dash: "Dashboard",
+    nav_sec_tools: "CREATION TOOLS", nav_ai: "AI Creator Studio", nav_thumb: "Thumbnails V2", nav_time: "Timecode Logger", nav_prompt: "Teleprompter",
+    nav_sec_manage: "MANAGEMENT & FOCUS", nav_kanban: "Kanban Board", nav_sound: "Focus Soundboard", nav_invoice: "Quick Invoice", nav_color: "Color Moodboard",
+    nav_sec_help: "HELP", nav_guide: "คู่มือการใช้งาน", nav_logout: "ออกจากระบบ",
+    dash_title: "Welcome Back!", dash_sub: "ULTIMATE CREATOR SUITE IS ONLINE.",
+    card_ai_desc: "ปั่นชื่อคลิป, เขียนสคริปต์เต็ม และหาไอเดียภาพ B-Roll จบในที่เดียว", card_kanban_desc: "ลาก-วาง จัดการสถานะวิดีโอตั้งแต่ไอเดียจนถึงอัปโหลด", card_sound_desc: "เสียงสร้างบรรยากาศ (ฝน, ทะเล, อวกาศ) ช่วยเพิ่มสมาธิตอนตัดต่อ", card_inv_desc: "ออกใบเสนอราคา / ใบแจ้งหนี้ด่วน กดปุ่มเดียวเป็น PDF", card_thumb_desc: "สร้างปกคลิปแบบมีเลเยอร์ ลากย่อขยายอิสระ มี Safe Zone", card_tc_desc: "จดเวลา มาร์คจุดตัดต่อ โหลดไฟล์ CSV นำเข้าโปรแกรมตัดต่อ",
+    btn_back: "← กลับหน้าหลัก",
+    ai_desc: "ผู้ช่วยอัจฉริยะ ปั่นคอนเทนต์ตั้งแต่คิดชื่อยันหาภาพประกอบ", ai_label_topic: "1. กำหนดหัวข้อ / คีย์เวิร์ด (Topic)", ai_ph_topic: "พิมพ์หัวข้อวิดีโอที่ต้องการ...", ai_btn_title: "🎣 1. ปั่นชื่อคลิป & ฮุคหยุดนิ้ว", ai_btn_script: "📝 2. เขียนสคริปต์เต็ม", ai_btn_broll: "🎞️ 3. หาไอเดียภาพ (B-Roll)",
+    kb_desc: "ลาก-วาง เพื่ออัปเดตสถานะงาน (ข้อมูลบันทึกอัตโนมัติ)", kb_ph_task: "ชื่อโปรเจกต์ใหม่...", kb_btn_add: "+ เพิ่มโปรเจกต์", kb_col1: "💡 ไอเดีย (Ideas)", kb_col2: "📝 เขียนสคริปต์", kb_col3: "🎥 กำลังถ่ายทำ", kb_col4: "✂️ กำลังตัดต่อ", kb_col5: "✅ พร้อมอัปโหลด",
+    snd_desc: "เปิดเสียงสร้างบรรยากาศ สังเคราะห์ผ่าน Web Audio API สดๆ ไม่พึ่งเน็ต", snd_btn_stop: "🛑 ปิดเสียงทั้งหมด", snd_rain: "เสียงฝนตก (Brown Noise)", snd_space: "ความถี่อวกาศลอยคอ", snd_wave: "เสียงคลื่นทะเลเข้าฝั่ง", snd_focus: "คลื่นสมองเพิ่มสมาธิ (40Hz)",
+    inv_desc: "ออกใบเสนอราคา / ใบแจ้งหนี้ ฉบับย่อ", inv_h1: "📝 ข้อมูลลูกค้าและงาน", inv_lbl_client: "ชื่อลูกค้า / บริษัท", inv_lbl_date: "วันที่ออกบิล", inv_lbl_job: "ชื่องาน / โปรเจกต์", inv_lbl_price: "ราคา (หน่วย)", inv_lbl_note: "หมายเหตุ", inv_btn_pdf: "⬇️ บันทึกเป็นไฟล์ PDF",
+    tb_btn_dl: "⬇ โหลดรูป / ZIP", tb_btn_clear: "✕ ล้างพื้นหลัง", tb_h1: "🖼 1. พื้นหลัง & เช็คระยะ", tb_upload: "คลิกเพื่ออัปโหลดพื้นหลัง", tb_color: "สีพื้นหลัง", tb_safe: "📱 เปิดดูเส้น Safe Zone", tb_h2: "✍️ 2. เลเยอร์ (Layers)", tb_add_txt: "+ ข้อความ", tb_add_img: "+ รูปภาพ", tb_h3: "🎨 3. Gradient Overlay", tb_grad_dir: "ทิศทาง", tb_grad_op: "ความเข้มดำ",
+    tc_desc: "💡 ในช่องโน้ต กด <kbd>Enter</kbd> เพื่อ Stamp เวลา ข้อมูลจดออโต้", tc_upload: "คลิกเพื่อเลือกไฟล์วิดีโอจากเครื่อง", tc_ph_note: "พิมพ์โน้ตตรงนี้... แล้วกด Enter", tc_btn_stamp: "⏺ สแตมป์", tc_btn_csv: "⬇ โหลด .CSV", tc_log: "TIMECODE LOG — ", tc_btn_clear: "🗑 ล้างข้อมูล",
+    mb_desc: "เก็บโค้ดสีประจำโปรเจกต์ รีเฟรชหน้าเว็บก็ไม่หาย", mb_h1: "🎨 เพิ่มสีลงใน Palette", mb_sel: "เลือกกลุ่ม (Palette)", mb_pick: "จิ้มสี", mb_btn_add: "+ เพิ่มสี",
+    pm_desc: "อ่านสคริปต์ลื่นไหล พร้อมระบบคำนวณเวลาและสะท้อนกระจก", pm_h1: "⚙️ ตั้งค่าสคริปต์", pm_speed: "ความเร็ว:", pm_size: "ขนาด:", pm_mirror: "พลิกข้อความ (Mirror Mode)"
+  }
+};
+
+function initThemeAndLang() {
+    const savedTheme = localStorage.getItem('joeStudioThemeV2');
+    if (savedTheme && themes.includes(savedTheme)) currentThemeIdx = themes.indexOf(savedTheme);
+    applyTheme();
+    applyLang();
+}
+
+function cycleTheme() {
+    currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+    localStorage.setItem('joeStudioThemeV2', themes[currentThemeIdx]);
+    applyTheme();
+    toast(`THEME: ${themes[currentThemeIdx].toUpperCase()}`, 'success');
+}
+
+function applyTheme() {
+    document.body.className = themes[currentThemeIdx] === 'cyber' ? '' : 'theme-' + themes[currentThemeIdx];
+    document.getElementById('theme-btn-main').textContent = `THEME: ${themes[currentThemeIdx].toUpperCase()}`;
+}
+
+function toggleLang() {
+    currentLang = currentLang === 'th' ? 'en' : 'th';
+    localStorage.setItem('joeStudioLang', currentLang);
+    applyLang();
+    toast(currentLang === 'th' ? 'เปลี่ยนภาษา: ไทย' : 'Lang: EN', 'success');
+}
+
+function applyLang() {
+    const t = i18n[currentLang];
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t[el.getAttribute('data-i18n')]; });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t[el.getAttribute('data-i18n-placeholder')]; });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CORE & LOGIN SYSTEM (WITH KEYBOARD SUPPORT)
+   ═══════════════════════════════════════════════════════════ */
+let lockDigits = [0, 0, 0, 0, 0, 0];
+let activeDigitIdx = 0; 
+
+function buildCyberLock() {
+    const container = document.getElementById('cyber-lock-grid');
+    container.innerHTML = '';
+    for(let i=0; i<6; i++) {
+        container.innerHTML += `
+            <div class="digit-col" id="col-${i}" onwheel="scrollDigit(event, ${i})">
+                <button class="arrow-btn" onclick="changeDigit(${i}, 1)">▲</button>
+                <div class="digit-display" id="digit-${i}">0</div>
+                <button class="arrow-btn" onclick="changeDigit(${i}, -1)">▼</button>
+            </div>
+        `;
+    }
+    updateActiveColHighlight();
+}
+
+function updateActiveColHighlight() {
+    for(let i=0; i<6; i++) {
+        const col = document.getElementById(`col-${i}`);
+        if(col) {
+            if(i === activeDigitIdx) col.classList.add('active-col');
+            else col.classList.remove('active-col');
+        }
+    }
+}
+
+function changeDigit(idx, dir) {
+    lockDigits[idx] += dir;
+    if(lockDigits[idx] > 9) lockDigits[idx] = 0;
+    if(lockDigits[idx] < 0) lockDigits[idx] = 9;
+    document.getElementById('digit-'+idx).textContent = lockDigits[idx];
+    if(navigator.vibrate) navigator.vibrate(20);
+    activeDigitIdx = idx;
+    updateActiveColHighlight();
+}
+
+function scrollDigit(e, idx) {
+    e.preventDefault();
+    if(e.deltaY < 0) changeDigit(idx, 1); else changeDigit(idx, -1);
+}
+
+// ⌨️ KEYBOARD SUPPORT
+document.addEventListener('keydown', (e) => {
+    const loginScreen = document.getElementById('login-screen');
+    if(loginScreen.style.display !== 'none') {
+        if(e.key >= '0' && e.key <= '9') {
+            if(activeDigitIdx < 6) {
+                lockDigits[activeDigitIdx] = parseInt(e.key);
+                document.getElementById(`digit-${activeDigitIdx}`).textContent = lockDigits[activeDigitIdx];
+                if(activeDigitIdx < 5) activeDigitIdx++;
+                updateActiveColHighlight();
+                if(navigator.vibrate) navigator.vibrate(10);
+            }
+        } else if (e.key === 'Backspace') {
+            if(activeDigitIdx > 0 && lockDigits[activeDigitIdx] === 0) activeDigitIdx--;
+            lockDigits[activeDigitIdx] = 0;
+            document.getElementById(`digit-${activeDigitIdx}`).textContent = 0;
+            updateActiveColHighlight();
+            if(navigator.vibrate) navigator.vibrate(10);
+        } else if (e.key === 'Enter') {
+            checkCyberLogin();
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    initThemeAndLang();
+    if(localStorage.getItem('joeAuthV2') === 'true') {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+    } else { buildCyberLock(); }
+});
+
+function checkCyberLogin() {
+    const pwd = lockDigits.join('');
+    if(pwd === '155121') {
+        localStorage.setItem('joeAuthV2', 'true');
+        toast('✅ ACCESS GRANTED', 'success');
+        const loginScreen = document.getElementById('login-screen');
+        loginScreen.classList.add('warp-active');
+        setTimeout(() => {
+            loginScreen.style.display = 'none';
+            const appContent = document.getElementById('app-content');
+            appContent.style.display = 'block';
+            appContent.classList.add('boot-active'); 
+        }, 800);
+    } else {
+        toast('❌ ACCESS DENIED', 'error');
+        const lockContainer = document.getElementById('login-box-container');
+        lockContainer.classList.add('error-shake');
+        if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        setTimeout(() => {
+            lockContainer.classList.remove('error-shake');
+            lockDigits = [0,0,0,0,0,0];
+            activeDigitIdx = 0;
+            for(let i=0;i<6;i++) document.getElementById(`digit-${i}`).textContent = 0;
+            updateActiveColHighlight();
+        }, 400);
+    }
+}
+
+function logout() { localStorage.removeItem('joeAuthV2'); location.reload(); }
+
+function showView(id, navEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  
+  if (id === 'thumbnail') { renderLayers(); drawThumb(); }
+  if (id === 'moodboard') renderPalettes();
+  if (id === 'prompter') { updatePrompterText(); updatePrompterStyle(); }
+}
+
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.style.color = type === 'error' ? 'var(--red)' : (type === 'success' ? 'var(--cyan)' : 'var(--text)');
+  t.style.borderColor = type === 'error' ? 'rgba(248,113,113,0.3)' : (type === 'success' ? 'rgba(0,229,255,0.3)' : 'var(--border)');
+  t.className = 'toast show';
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 1: AI STUDIO 
+   ═══════════════════════════════════════════════════════════ */
+function openApiModal() { document.getElementById('apiKeyInput').value = localStorage.getItem('geminiKeyJoe') || ''; document.getElementById('apiModal').classList.add('active'); }
+function closeApiModal() { document.getElementById('apiModal').classList.remove('active'); }
+function saveApiKey() { const k = document.getElementById('apiKeyInput').value.trim(); if(k) { localStorage.setItem('geminiKeyJoe', k); toast('💾 บันทึก API Key แล้ว!', 'success'); } else { localStorage.removeItem('geminiKeyJoe'); toast('🗑 ลบกุญแจแล้ว'); } closeApiModal(); }
+
+async function callGemini(promptText, titleText) {
+    const key = localStorage.getItem('geminiKeyJoe');
+    if(!key) { toast('⚠️ ใส่ API Key ก่อนใช้งาน AI', 'error'); openApiModal(); return; }
+    
+    document.getElementById('ai-output-container').style.display = 'block';
+    document.getElementById('ai-output-title').innerText = `⏳ กำลังประมวลผล: ${titleText}...`;
+    document.getElementById('ai-output-box').innerHTML = '<span style="color:var(--muted)">ระบบกำลังส่งข้อมูลไปยังสมองกล...</span>';
+
+    try {
+        const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+        });
+        const data = await resp.json();
+        if(data.error) throw new Error(data.error.message);
+        
+        document.getElementById('ai-output-title').innerText = `✅ ผลลัพธ์: ${titleText}`;
+        let outText = data.candidates[0].content.parts[0].text;
+        
+        outText = outText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        outText = outText.replace(/\n/g, '<br>');
+        
+        document.getElementById('ai-output-box').innerHTML = outText;
+        toast('✨ ประมวลผลเสร็จสิ้น!', 'success');
+    } catch (e) {
+        document.getElementById('ai-output-box').innerText = `Error: ${e.message}`;
+        toast('❌ ขัดข้อง โปรดเช็ค API Key หรือเน็ต', 'error');
+    }
+}
+
+function generateAITitle() {
+    const topic = document.getElementById('ai-topic').value.trim();
+    if(!topic) { toast('⚠️ กรุณาพิมพ์หัวข้อก่อนเริ่มทำงาน', 'error'); return; }
+    const p = `คุณคือครีเอเตอร์สายไวรัล ช่วยคิด "ชื่อคลิป (Title)" 5 แบบ และ "ประโยคพูดเปิดคลิป 3 วินาทีแรก (Hook)" สำหรับเรื่อง: ${topic} โดยเน้นความน่าสงสัย (Curiosity Gap) เพื่อดึงคนดูให้หยุดนิ้ว`;
+    callGemini(p, 'Titles & Hooks');
+}
+function generateAIScript() {
+    const topic = document.getElementById('ai-topic').value.trim();
+    if(!topic) { toast('⚠️ กรุณาพิมพ์หัวข้อก่อนเริ่มทำงาน', 'error'); return; }
+    const p = `ช่วยเขียนสคริปต์วิดีโอสั้น (Shorts/TikTok) เรื่อง: ${topic} รูปแบบ: [HOOK] ประโยคดึงดูด, [BODY] เนื้อหา 3 ข้อเข้าใจง่าย, [CTA] ชวนคอมเมนต์ (ไม่ต้องเกริ่นนำ ตอบเฉพาะเนื้อหา)`;
+    callGemini(p, 'Full Script');
+}
+function generateAIBroll() {
+    const topic = document.getElementById('ai-topic').value.trim();
+    if(!topic) { toast('⚠️ กรุณาพิมพ์หัวข้อก่อนเริ่มทำงาน', 'error'); return; }
+    const p = `สำหรับสคริปต์เรื่อง: ${topic} ช่วยตีกรอบแนะนำภาพ B-Roll ออกมาเป็นข้อๆ ว่า "ช่วงเวลาไหน / ควรใช้ภาพหรือวิดีโอแนวไหนประกอบ / อารมณ์ภาพเป็นอย่างไร" เพื่อเป็นไกด์ให้คนตัดต่องาน`;
+    callGemini(p, 'B-Roll Ideas');
+}
+function copyAIOutput() {
+    const htmlOutput = document.getElementById('ai-output-box').innerHTML;
+    const textOutput = htmlOutput.replace(/<br>/g, '\n').replace(/<\/?[^>]+(>|$)/g, "");
+    navigator.clipboard.writeText(textOutput).then(()=>toast('✅ คัดลอกลง Clipboard แล้ว', 'success'));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 2: KANBAN BOARD
+   ═══════════════════════════════════════════════════════════ */
+let kanbanTasks = JSON.parse(localStorage.getItem('joeStudioKanbanV3')) || {
+    'col-idea': [], 'col-script': [], 'col-shoot': [], 'col-edit': [], 'col-done': []
+};
+
+function renderKanban() {
+    ['col-idea', 'col-script', 'col-shoot', 'col-edit', 'col-done'].forEach(colId => {
+        const container = document.getElementById(colId.replace('col-', 'items-'));
+        container.innerHTML = '';
+        if(kanbanTasks[colId]) {
+            kanbanTasks[colId].forEach(task => {
+                container.innerHTML += `<div class="k-item" draggable="true" ondragstart="drag(event, '${colId}', '${task.id}')" id="${task.id}">${task.text} <span class="k-item-del" onclick="delKanbanTask('${colId}','${task.id}')">✕</span></div>`;
+            });
+        }
+    });
+    localStorage.setItem('joeStudioKanbanV3', JSON.stringify(kanbanTasks));
+}
+
+function addKanbanTask() {
+    const text = document.getElementById('new-task-input').value.trim();
+    if(!text) return;
+    if(!kanbanTasks['col-idea']) kanbanTasks['col-idea'] = [];
+    kanbanTasks['col-idea'].push({id: 'task_'+Date.now(), text: text});
+    document.getElementById('new-task-input').value = '';
+    renderKanban();
+}
+
+function delKanbanTask(colId, taskId) {
+    kanbanTasks[colId] = kanbanTasks[colId].filter(t => t.id !== taskId);
+    renderKanban();
+}
+
+let dragData = null;
+function drag(ev, sourceCol, taskId) { dragData = {sourceCol, taskId}; ev.dataTransfer.setData("text", taskId); }
+function allowDrop(ev) { ev.preventDefault(); }
+function drop(ev) {
+    ev.preventDefault();
+    const targetCol = ev.currentTarget.id;
+    if(!targetCol.startsWith('col-')) return;
+    const taskIdx = kanbanTasks[dragData.sourceCol].findIndex(t => t.id === dragData.taskId);
+    if(taskIdx > -1) {
+        const task = kanbanTasks[dragData.sourceCol].splice(taskIdx, 1)[0];
+        if(!kanbanTasks[targetCol]) kanbanTasks[targetCol] = [];
+        kanbanTasks[targetCol].push(task);
+        renderKanban();
+    }
+}
+renderKanban();
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 3: FOCUS SOUNDBOARD
+   ═══════════════════════════════════════════════════════════ */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let sounds = { rain: null, space: null, wave: null, focus: null };
+let isPlaying = { rain: false, space: false, wave: false, focus: false };
+
+function createNoise(type) {
+    const bufferSize = audioCtx.sampleRate * 2; 
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let lastOut = 0;
+    for (let i = 0; i < bufferSize; i++) {
+        let white = Math.random() * 2 - 1;
+        if(type==='brown') { data[i] = (lastOut + (0.02 * white)) / 1.02; lastOut = data[i]; data[i] *= 3.5; }
+        else if(type==='pink') { data[i] = white * 0.5; }
+        else { data[i] = white; }
+    }
+    const noiseSource = audioCtx.createBufferSource();
+    noiseSource.buffer = buffer; noiseSource.loop = true;
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = type==='brown' ? 'lowpass' : 'bandpass';
+    filter.frequency.value = type==='brown' ? 400 : 1000;
+    const gainNode = audioCtx.createGain(); gainNode.gain.value = 0;
+    noiseSource.connect(filter); filter.connect(gainNode); gainNode.connect(audioCtx.destination);
+    noiseSource.start(); return gainNode;
+}
+
+function createOscillator(freq, type='sine') {
+    const osc = audioCtx.createOscillator(); osc.type = type; osc.frequency.value = freq;
+    const gainNode = audioCtx.createGain(); gainNode.gain.value = 0;
+    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+    osc.start(); return gainNode;
+}
+
+function initSounds() {
+    if(!sounds.rain) sounds.rain = createNoise('brown');
+    if(!sounds.wave) sounds.wave = createNoise('pink');
+    if(!sounds.space) sounds.space = createOscillator(55, 'triangle');
+    if(!sounds.focus) {
+        sounds.focus = audioCtx.createGain(); sounds.focus.gain.value = 0; sounds.focus.connect(audioCtx.destination);
+        const o1 = audioCtx.createOscillator(); o1.frequency.value = 200; o1.connect(sounds.focus); o1.start();
+        const o2 = audioCtx.createOscillator(); o2.frequency.value = 240; o2.connect(sounds.focus); o2.start();
+    }
+}
+
+function toggleSound(id) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    initSounds();
+    const btn = document.getElementById(`btn-snd-${id}`);
+    const volInput = document.getElementById(`vol-${id}`).value;
+    
+    isPlaying[id] = !isPlaying[id];
+    if(isPlaying[id]) {
+        btn.innerText = 'Pause'; btn.style.background = 'var(--amber)'; btn.style.color = '#000';
+        sounds[id].gain.setTargetAtTime(parseFloat(volInput), audioCtx.currentTime, 0.5);
+    } else {
+        btn.innerText = 'Play'; btn.style.background = 'var(--cyan)'; btn.style.color = '#000';
+        sounds[id].gain.setTargetAtTime(0, audioCtx.currentTime, 0.5);
+    }
+}
+
+function updateVol(id, val) {
+    if(isPlaying[id] && sounds[id]) {
+        sounds[id].gain.setTargetAtTime(parseFloat(val), audioCtx.currentTime, 0.1);
+    }
+}
+
+function stopAllSounds() {
+    let stopped = false;
+    Object.keys(isPlaying).forEach(id => {
+        if(isPlaying[id]) { toggleSound(id); stopped = true; }
+    });
+    if(stopped) toast('🛑 ปิดเสียงทั้งหมดแล้ว', 'success');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 4: INVOICE MAKER (PDF)
+   ═══════════════════════════════════════════════════════════ */
+function updateInvoice() {
+    const dDate = document.getElementById('inv-date').value || new Date().toISOString().split('T')[0];
+    const dClient = document.getElementById('inv-client').value || 'Client Name';
+    const dJob = document.getElementById('inv-job').value || 'รายละเอียดงาน';
+    const dPrice = parseFloat(document.getElementById('inv-price').value || 0).toLocaleString();
+    const dNote = document.getElementById('inv-note').value || '-';
+    
+    document.getElementById('preview-date').innerText = dDate;
+    document.getElementById('preview-client').innerText = dClient;
+    document.getElementById('preview-job').innerText = dJob;
+    document.getElementById('preview-price').innerText = dPrice;
+    document.getElementById('preview-total').innerText = dPrice;
+    document.getElementById('preview-note').innerText = dNote;
+}
+
+function downloadInvoicePDF() {
+    updateInvoice();
+    const element = document.getElementById('invoice-doc');
+    const clientName = document.getElementById('inv-client').value || 'Client';
+    const opt = {
+      margin:       0.5,
+      filename:     `Invoice_${clientName}_JoeStudio.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save().then(() => {
+        toast('✅ โหลดไฟล์ PDF สำเร็จ', 'success');
+    });
+}
+document.getElementById('inv-date').value = new Date().toISOString().split('T')[0];
+updateInvoice();
+
+
+/* ═══════════════════════════════════════════════════════════
+   LEGACY: THUMBNAIL, TIMECODE, PROMPTER, MOODBOARD
+   ═══════════════════════════════════════════════════════════ */
+
+// --- Thumbnail System ---
+const canvas = document.getElementById('thumb-canvas'); const ctx = canvas.getContext('2d');
+let bgImages = []; let currentBgIdx = 0;
+let appLayers = JSON.parse(localStorage.getItem('joeThumbTextLayersV4')) || [
+  { id: 1, type: 'text', text: 'NEW TITLE\nBY JOE', x: 640, y: 300, size: 96, font: "'Prompt'", color: '#FFFFFF', shColor: '#FF2E93', shSize: 12 },
+  { id: 2, type: 'text', text: '@JoeStudio', x: 640, y: 480, size: 40, font: "'Space Mono'", color: '#00E5FF', shColor: 'rgba(0,0,0,0.8)', shSize: 8 }
+];
+const savedSettings = JSON.parse(localStorage.getItem('joeThumbSettings'));
+if(savedSettings) { document.getElementById('bg-color').value = savedSettings.bg || '#0A0A0A'; document.getElementById('overlay-dir').value = savedSettings.dir || 'none'; document.getElementById('overlay-opacity').value = savedSettings.opac || 50; }
+let dragTarget = null; let isDragging = false, isResizing = false; let dragOffX = 0, dragOffY = 0, resizeStartDist = 0, resizeStartSize = 0;
+
+function saveThumbState() { const textOnly = appLayers.filter(l => l.type === 'text'); localStorage.setItem('joeThumbTextLayersV4', JSON.stringify(textOnly)); }
+function saveThumbSettings() { localStorage.setItem('joeThumbSettings', JSON.stringify({ bg: document.getElementById('bg-color').value, dir: document.getElementById('overlay-dir').value, opac: document.getElementById('overlay-opacity').value })); }
+
+function loadBg(e) {
+  const files = e.target.files; if (!files.length) return; bgImages = []; currentBgIdx = 0; let loaded = 0;
+  for(let i = 0; i < files.length; i++) {
+    const img = new Image(); img.onload = () => { bgImages.push(img); loaded++; if (loaded === files.length) { updateBgCounter(); centerTextToCurrentBg(); drawThumb(); } };
+    img.src = URL.createObjectURL(files[i]);
+  }
+}
+function updateBgCounter() { document.getElementById('bg-counter').textContent = bgImages.length === 0 ? "0 / 0" : `${currentBgIdx + 1} / ${bgImages.length}`; }
+function prevBg() { if(bgImages.length>1) { currentBgIdx = (currentBgIdx - 1 + bgImages.length) % bgImages.length; centerTextToCurrentBg(); updateBgCounter(); drawThumb(); } }
+function nextBg() { if(bgImages.length>1) { currentBgIdx = (currentBgIdx + 1) % bgImages.length; centerTextToCurrentBg(); updateBgCounter(); drawThumb(); } }
+function clearCanvas() { bgImages = []; currentBgIdx = 0; document.getElementById('bg-upload').value = ''; updateBgCounter(); drawThumb(); }
+function centerTextToCurrentBg() { if(!bgImages[currentBgIdx]) return; const w = bgImages[currentBgIdx].width; const h = bgImages[currentBgIdx].height; appLayers.forEach((n, idx) => { n.x = w/2; n.y = (h/3) + (idx * (h/8)); }); saveThumbState(); }
+function addImageLayer(e) {
+    const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
+    reader.onload = (ev) => { const img = new Image(); img.onload = () => { const cw = canvas.width || 1280; const ch = canvas.height || 720; appLayers.push({ id: Date.now(), type: 'image', imgObj: img, x: cw / 2, y: ch / 2, size: img.width > 400 ? 400 : img.width, aspect: img.height / img.width }); renderLayers(); drawThumb(); }; img.src = ev.target.result; }; reader.readAsDataURL(file); e.target.value = ''; 
+}
+function moveLayerUp(id) { const idx = appLayers.findIndex(n => n.id === id); if(idx < appLayers.length - 1) { const temp = appLayers[idx]; appLayers[idx] = appLayers[idx+1]; appLayers[idx+1] = temp; renderLayers(); drawThumb(); saveThumbState(); } }
+function moveLayerDown(id) { const idx = appLayers.findIndex(n => n.id === id); if(idx > 0) { const temp = appLayers[idx]; appLayers[idx] = appLayers[idx-1]; appLayers[idx-1] = temp; renderLayers(); drawThumb(); saveThumbState(); } }
+function removeLayer(id) { appLayers = appLayers.filter(n => n.id !== id); if(dragTarget && dragTarget.id === id) dragTarget = null; renderLayers(); drawThumb(); saveThumbState(); }
+
+function renderLayers() {
+  const wrap = document.getElementById('layers-container');
+  wrap.innerHTML = [...appLayers].reverse().map((node, reversedIdx) => {
+      const actualIdx = appLayers.length - 1 - reversedIdx;
+      const moveControls = `<div style="display:flex; gap:2px;"><button class="layer-action-btn" title="เลื่อนลง" onclick="event.stopPropagation(); moveLayerDown(${node.id})">⬇️</button><button class="layer-action-btn" title="เลื่อนขึ้น" onclick="event.stopPropagation(); moveLayerUp(${node.id})">⬆️</button><button class="layer-action-btn" style="color:var(--red); margin-left:4px;" title="ลบ" onclick="event.stopPropagation(); removeLayer(${node.id})">✖</button></div>`;
+      if(node.type === 'text') {
+          return `
+            <div class="layer-box" onmousedown="focusLayer(${node.id})">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="font-size:11px; font-weight:700; color:var(--muted);">LAYER ${actualIdx + 1} (TEXT)</span>${moveControls}</div>
+              <textarea class="layer-input" style="resize:vertical;" rows="2" placeholder="พิมพ์ (กด Enter ขึ้นบรรทัดใหม่ได้)..." oninput="updateLayer(${node.id}, 'text', this.value)">${node.text.replace(/"/g, '&quot;')}</textarea>
+              <div class="layer-grid">
+                <select class="layer-input" style="margin:0;" onchange="updateLayer(${node.id}, 'font', this.value)"><option value="'Prompt'" ${node.font==="'Prompt'"?'selected':''}>Prompt</option><option value="'Bebas Neue'" ${node.font==="'Bebas Neue'"?'selected':''}>Bebas</option></select>
+                <input type="range" min="16" max="400" value="${node.size}" id="slider-${node.id}" oninput="updateLayer(${node.id}, 'size', this.value)">
+                <div style="display:flex; gap:4px;"><input type="color" class="color-swatch" title="สีฟอนต์" value="${node.color}" oninput="updateLayer(${node.id}, 'color', this.value)"><input type="color" class="color-swatch" title="สีเงา" value="${node.shColor}" oninput="updateLayer(${node.id}, 'shColor', this.value)"></div>
+              </div>
+            </div>`;
+      } else {
+          return `
+            <div class="layer-box" onmousedown="focusLayer(${node.id})">
+              <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span style="font-size:11px; font-weight:700; color:var(--cyan);">LAYER ${actualIdx + 1} (IMAGE)</span>${moveControls}</div>
+              <div style="display:flex; align-items:center; gap:8px;"><span style="font-size:11px; color:var(--muted);">ขนาด:</span><input type="range" min="20" max="1500" value="${node.size}" id="slider-${node.id}" style="flex:1;" oninput="updateLayer(${node.id}, 'size', this.value)"></div>
+            </div>`;
+      }
+  }).join('');
+}
+
+function focusLayer(id) { dragTarget = appLayers.find(n => n.id === id); drawThumb(); }
+function updateLayer(id, key, val) { let node = appLayers.find(n => n.id === id); if(node) { if(key==='size') node.size = parseInt(val); else node[key] = val; drawThumb(); saveThumbState(); } }
+function addTextLayer() { const cw = canvas.width || 1280; const ch = canvas.height || 720; appLayers.push({ id: Date.now(), type:'text', text: 'ข้อความใหม่\nตรงนี้', x: cw/2, y: ch/2, size: 60, font: "'Prompt'", color: '#FFFFFF', shColor: '#000000', shSize: 6 }); renderLayers(); drawThumb(); saveThumbState(); }
+function syncSliderFromCanvas() { if(dragTarget) { const s = document.getElementById(`slider-${dragTarget.id}`); if(s) s.value = dragTarget.size; } }
+
+function drawThumb() {
+  const W = bgImages.length > 0 ? bgImages[currentBgIdx].width : 1280;
+  const H = bgImages.length > 0 ? bgImages[currentBgIdx].height : 720;
+  canvas.width = W; canvas.height = H; ctx.clearRect(0, 0, W, H);
+  if (bgImages.length > 0) ctx.drawImage(bgImages[currentBgIdx], 0, 0, W, H); else { ctx.fillStyle = document.getElementById('bg-color').value; ctx.fillRect(0, 0, W, H); }
+  
+  const dir = document.getElementById('overlay-dir').value;
+  if (dir !== 'none') {
+    const opac = document.getElementById('overlay-opacity').value / 100;
+    let x0 = 0, y0 = 0, x1 = 0, y1 = 0; if (dir === 'bottom') { y0 = H; y1 = 0; } else if (dir === 'top') { y0 = 0; y1 = H; }
+    const grad = ctx.createLinearGradient(x0, y0, x1, y1); grad.addColorStop(0, `rgba(0,0,0,${opac})`); grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+  }
+  
+  const safeZone = document.getElementById('safe-zone').value;
+  if(safeZone === 'tiktok') {
+      ctx.save(); ctx.fillStyle = 'rgba(255, 0, 50, 0.4)'; 
+      const iconWidth = W * 0.15; const iconHeight = H * 0.45; ctx.fillRect(W - iconWidth, H - iconHeight - (H*0.1), iconWidth, iconHeight);
+      const bottomHeight = H * 0.25; ctx.fillRect(0, H - bottomHeight, W, bottomHeight);
+      ctx.fillStyle = 'white'; ctx.font = `bold ${Math.max(20, W*0.03)}px Prompt`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('พื้นที่บัง (TikTok UI)', W/2, H - (bottomHeight/2));
+      ctx.restore();
+  } else if (safeZone === 'youtube') {
+      ctx.save(); ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; ctx.fillRect(W - (W*0.15), H - (H*0.15), W*0.15, H*0.15);
+      ctx.fillStyle = 'white'; ctx.font = `bold ${Math.max(16, W*0.02)}px Prompt`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('TIMESTAMP', W - (W*0.075), H - (H*0.075));
+      ctx.restore();
+  }
+
+  appLayers.forEach(n => {
+    ctx.save(); 
+    if(n.type === 'text' && n.text) {
+        const lines = n.text.split('\n');
+        const lineHeight = n.size * 1.2;
+        const totalHeight = lineHeight * lines.length;
+        const startY = n.y - (totalHeight / 2) + (lineHeight / 2);
+
+        ctx.font = `900 ${n.size}px ${n.font}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        
+        lines.forEach((line, i) => {
+            const currentY = startY + (i * lineHeight);
+            if(n.shSize > 0) { 
+                ctx.shadowColor = n.shColor; ctx.shadowBlur = n.shSize * 2; 
+                ctx.strokeStyle = n.shColor; ctx.lineWidth = n.shSize; ctx.lineJoin = 'round'; 
+                ctx.strokeText(line, n.x, currentY); 
+            }
+            ctx.shadowBlur = 0; ctx.fillStyle = n.color; ctx.fillText(line, n.x, currentY);
+        });
+
+    } else if (n.type === 'image' && n.imgObj) { 
+        const w = n.size; const h = n.size * n.aspect; ctx.drawImage(n.imgObj, n.x - w/2, n.y - h/2, w, h); 
+    }
+    ctx.restore();
+
+    if(dragTarget === n) {
+      let tw = 0, th = 0;
+      if(n.type === 'text') { 
+          ctx.font = `900 ${n.size}px ${n.font}`; 
+          const lines = n.text.split('\n');
+          lines.forEach(line => { const w = ctx.measureText(line).width; if (w > tw) tw = w; });
+          tw += 20; 
+          th = (n.size * 1.2 * lines.length) + 20;
+      } else { 
+          tw = n.size + 10; th = (n.size * n.aspect) + 10; 
+      }
+      ctx.strokeStyle = '#00E5FF'; ctx.lineWidth = 3; ctx.setLineDash([8, 6]); ctx.strokeRect(n.x - tw/2, n.y - th/2, tw, th); ctx.setLineDash([]);
+      ctx.fillStyle = '#FF2E93'; ctx.beginPath(); ctx.arc(n.x + tw/2, n.y + th/2, Math.max(16, Math.max(tw,th)*0.05), 0, Math.PI*2); ctx.fill();
+    }
+  });
+}
+
+function getPos(e) { const rect = canvas.getBoundingClientRect(); const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height; let cx = e.clientX, cy = e.clientY; if(e.touches && e.touches.length > 0) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; } return { x: (cx - rect.left) * scaleX, y: (cy - rect.top) * scaleY }; }
+function hitTest(x, y) {
+  if(dragTarget) {
+    let tw = 0, th = 0;
+    if(dragTarget.type === 'text') { 
+        ctx.font = `900 ${dragTarget.size}px ${dragTarget.font}`; 
+        const lines = dragTarget.text.split('\n');
+        lines.forEach(line => { const w = ctx.measureText(line).width; if (w > tw) tw = w; });
+        tw += 20; th = (dragTarget.size * 1.2 * lines.length) + 20;
+    } else { tw = dragTarget.size + 10; th = (dragTarget.size * dragTarget.aspect) + 10; }
+    if(Math.hypot(x - (dragTarget.x + tw/2), y - (dragTarget.y + th/2)) < Math.max(25, Math.max(tw,th) * 0.1)) return 'resize';
+  }
+  for(let i = appLayers.length - 1; i >= 0; i--) {
+    const n = appLayers[i]; let tw = 0, th = 0;
+    if(n.type === 'text') { 
+        ctx.font = `900 ${n.size}px ${n.font}`; 
+        const lines = n.text.split('\n');
+        lines.forEach(line => { const w = ctx.measureText(line).width; if (w > tw) tw = w; });
+        tw += 20; th = (n.size * 1.2 * lines.length) + 20;
+    } else { tw = n.size + 10; th = (n.size * n.aspect) + 10; }
+    if(x >= n.x - tw/2 && x <= n.x + tw/2 && y >= n.y - th/2 && y <= n.y + th/2) return n;
+  }
+  return null;
+}
+const handleStart = (e) => { const {x, y} = getPos(e); const hit = hitTest(x, y); if(hit === 'resize') { isResizing=true; isDragging=false; resizeStartDist=Math.hypot(x-dragTarget.x, y-dragTarget.y); resizeStartSize=dragTarget.size; } else if(hit) { dragTarget=hit; isResizing=false; isDragging=true; dragOffX=x-dragTarget.x; dragOffY=y-dragTarget.y; } else { dragTarget=null; } if(hit) { if(e.type==='touchstart') e.preventDefault(); } drawThumb(); };
+const handleMove = (e) => { if(!dragTarget || (!isDragging && !isResizing)) return; if(e.type==='touchmove') e.preventDefault(); const {x, y} = getPos(e); if(isResizing) { const dist = Math.hypot(x-dragTarget.x, y-dragTarget.y); dragTarget.size = Math.max(16, Math.min(2000, resizeStartSize * (dist/resizeStartDist))); syncSliderFromCanvas(); } else if(isDragging) { dragTarget.x = x-dragOffX; dragTarget.y = y-dragOffY; } drawThumb(); };
+const handleEnd = () => { isResizing = false; isDragging = false; saveThumbState(); };
+canvas.addEventListener('mousedown', handleStart); window.addEventListener('mousemove', handleMove); window.addEventListener('mouseup', handleEnd);
+canvas.addEventListener('touchstart', handleStart, {passive:false}); canvas.addEventListener('touchmove', handleMove, {passive:false}); canvas.addEventListener('touchend', handleEnd);
+
+async function downloadThumb() {
+  dragTarget = null; drawThumb(); 
+  if(bgImages.length <= 1) { const a = document.createElement('a'); a.download = 'JoeStudio_Cover.png'; a.href = canvas.toDataURL('image/png'); a.click(); toast('✅ โหลดไฟล์ PNG แล้ว!', 'success'); } 
+  else {
+    const zip = new JSZip(); const originalIdx = currentBgIdx; 
+    for(let i=0; i<bgImages.length; i++){ currentBgIdx = i; drawThumb(); await new Promise(r => { canvas.toBlob(blob => { zip.file(`Cover_Batch_${i+1}.png`, blob); r(); }, 'image/png'); }); }
+    currentBgIdx = originalIdx; drawThumb(); const content = await zip.generateAsync({type:"blob"}); const a = document.createElement('a'); a.href = URL.createObjectURL(content); a.download = `JoeStudio_Batch_${Date.now()}.zip`; a.click(); toast('✅ โหลดไฟล์ ZIP แล้ว!', 'success');
+  }
+}
+
+// --- Timecode System ---
+let logEntries = JSON.parse(localStorage.getItem('joeTimecodeLogs')) || [];
+const video = document.getElementById('main-video'); setTimeout(renderLog, 200);
+function loadVideo(e) { const file = e.target.files[0]; if (!file) return; video.src = URL.createObjectURL(file); video.style.display = 'block'; document.getElementById('video-drop').style.display = 'none'; video.addEventListener('timeupdate', () => { document.getElementById('tc-display').textContent = formatTC(video.currentTime); }); }
+function formatTC(secs) { const m = Math.floor(secs / 60); const s = Math.floor(secs % 60); const ms = Math.floor((secs % 1) * 1000); return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`; }
+function stampTime() { const tc = video.src ? formatTC(video.currentTime) : formatTC(0); const note = document.getElementById('tc-note').value || '—'; const type = document.getElementById('tc-type').value; logEntries.push({ id: Date.now(), tc, note, type }); document.getElementById('tc-note').value = ''; renderLog(); toast('⏺ สแตมป์เวลาแล้ว', 'success'); }
+const typeLabel = { cut: '✂️ คัททิ้ง', fx: '✨ ใส่เอฟเฟกต์', note: '📝 โน้ต' }; const typeCls = { cut: 'badge-cut', fx: 'badge-fx', note: 'badge-note' };
+function renderLog() {
+  localStorage.setItem('joeTimecodeLogs', JSON.stringify(logEntries)); const tbody = document.getElementById('log-body'); document.getElementById('log-count').textContent = logEntries.length;
+  if (!logEntries.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:32px;font-size:13px;">ยังไม่มีข้อมูลบันทึก</td></tr>'; return; }
+  tbody.innerHTML = logEntries.map((e, idx) => `<tr><td style="color:var(--muted);font-size:12px;">${idx + 1}</td><td><span class="tc-stamp">${e.tc}</span></td><td><span class="log-type-badge ${typeCls[e.type]}">${typeLabel[e.type]}</span></td><td style="font-size:13px;">${e.note}</td><td><button class="del-btn" onclick="delLog(${e.id})">✕</button></td></tr>`).join('');
+}
+function delLog(id) { logEntries = logEntries.filter(e => e.id !== id); renderLog(); }
+function clearLog() { if(confirm('ล้างข้อมูลทั้งหมด?')) { logEntries = []; renderLog(); toast('🗑 ล้างข้อมูลแล้ว'); } }
+function copyAllLog() { if (!logEntries.length) { toast('⚠️ ไม่มีข้อมูล', 'error'); return; } const text = 'TIMECODE LOGS\n' + '='.repeat(30) + '\n' + logEntries.map(e => `${e.tc} [${typeLabel[e.type]}] ${e.note}`).join('\n'); navigator.clipboard.writeText(text).then(() => toast('✅ Copy สำเร็จ!', 'success')); }
+function exportTimecodeCSV() {
+    if(logEntries.length === 0) { toast('⚠️ ไม่มีข้อมูลให้โหลด', 'error'); return; }
+    let csv = 'ID,TIMECODE,TYPE,NOTE\n'; logEntries.forEach((e, i) => { csv += `"${i+1}","${e.tc}","${typeLabel[e.type]}","${e.note.replace(/"/g, '""')}"\n`; });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Timecode_Log_${Date.now()}.csv`; a.click(); toast('✅ โหลดไฟล์ CSV สำเร็จ!', 'success');
+}
+
+// --- Moodboard System ---
+let palettes = JSON.parse(localStorage.getItem('joePalettesV2')) || [ { name: 'โปรเจกต์ 1', colors: [] }, { name: 'โปรเจกต์ 2', colors: [] }, { name: 'โปรเจกต์ลูกค้า', colors: [] } ];
+function renderPalettes() {
+  localStorage.setItem('joePalettesV2', JSON.stringify(palettes));
+  document.getElementById('palette-grid').innerHTML = palettes.map((pal, pi) => `<div class="palette-card"><div style="display:flex; justify-content:space-between; margin-bottom:14px;"><span style="font-weight:600; font-size:14px; color:var(--cyan);">${pal.name}</span><button onclick="palettes[${pi}].colors=[]; renderPalettes();" style="background:none; border:none; color:var(--muted); cursor:pointer; font-size:12px;">ล้างสี</button></div><div style="display:flex; gap:8px; flex-wrap:wrap;">${pal.colors.map(c => `<div class="swatch" style="background:${c};" onclick="copyColor('${c}')" title="คัดลอกโค้ด ${c}"></div>`).join('')}${pal.colors.length === 0 ? '<span style="font-size:12px; color:var(--muted);">ยังไม่มีสี</span>' : ''}</div></div>`).join('');
+}
+function addColorToBoard() {
+  const pi = parseInt(document.getElementById('target-palette').value); let hex = document.getElementById('new-color-hex').value.trim().toUpperCase();
+  if (!/^#[0-9A-F]{6}$/.test(hex)) { toast('⚠️ HEX Code ต้องเป็นเช่น #FF2E93', 'error'); return; } if (palettes[pi].colors.includes(hex)) { toast('⚠️ มีสีนี้อยู่แล้ว', 'error'); return; }
+  palettes[pi].colors.push(hex); renderPalettes(); toast(`✅ เพิ่มสี ${hex} แล้ว!`, 'success');
+}
+function copyColor(hex) { navigator.clipboard.writeText(hex).then(() => toast(`✅ ก๊อปปี้สี ${hex} แล้ว!`, 'success')); }
+document.getElementById('new-color-picker').addEventListener('input', function() { document.getElementById('new-color-hex').value = this.value.toUpperCase(); });
+document.getElementById('new-color-hex').addEventListener('input', function() { if (/^#[0-9A-F]{6}$/i.test(this.value)) document.getElementById('new-color-picker').value = this.value; });
+
+// --- Prompter System ---
+let prompterPlaying = false; let prompterY = 0; let prompterAnimId;
+function updatePrompterText() {
+  let rawText = document.getElementById('prompter-input').value; let text = rawText.replace(/\n/g, '<br>'); document.getElementById('prompter-content').innerHTML = text;
+  let chars = rawText.replace(/\s/g,'').length; let seconds = Math.round((chars / 600) * 60); let m = Math.floor(seconds / 60); let s = seconds % 60;
+  document.getElementById('read-time-est').textContent = `เวลาอ่านประมาณ: ${m} นาที ${s} วินาที`;
+}
+function updatePrompterStyle() {
+  const size = document.getElementById('prompter-size').value; const isMirror = document.getElementById('prompter-mirror').checked;
+  document.getElementById('p-size-val').textContent = size;
+  const content = document.getElementById('prompter-content'); content.style.fontSize = size + 'px'; content.style.transform = `translateY(${prompterY}px) scaleX(${isMirror ? -1 : 1})`;
+}
+function togglePrompter() {
+  const btn = document.getElementById('btn-prompter-play'); prompterPlaying = !prompterPlaying;
+  if(prompterPlaying) { btn.innerHTML = '⏸ Pause'; btn.style.background = 'var(--amber)'; btn.style.color = '#000'; prompterLoop(); } 
+  else { btn.innerHTML = '▶ Play'; btn.style.background = 'var(--cyan)'; btn.style.color = '#000'; cancelAnimationFrame(prompterAnimId); }
+}
+function resetPrompter() { prompterY = 0; prompterPlaying = false; const btn = document.getElementById('btn-prompter-play'); btn.innerHTML = '▶ Play'; btn.style.background = 'var(--cyan)'; btn.style.color = '#000'; cancelAnimationFrame(prompterAnimId); updatePrompterStyle(); }
+function prompterLoop() { if(!prompterPlaying) return; const speed = parseFloat(document.getElementById('prompter-speed').value); prompterY -= (speed * 0.5); updatePrompterStyle(); prompterAnimId = requestAnimationFrame(prompterLoop); }
+
+// --- INIT ---
+renderLayers(); drawThumb(); updatePrompterText(); updatePrompterStyle(); renderPalettes();
+</script>
+</body>
+</html>
